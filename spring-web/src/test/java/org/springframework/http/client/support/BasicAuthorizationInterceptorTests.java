@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class BasicAuthorizationInterceptorTests {
 		new BasicAuthorizationInterceptor("spring", "boot").intercept(request, body,
 				execution);
 		verify(execution).execute(request, body);
-		assertThat(request.getHeaders().getFirst("Authorization")).isEqualTo("Basic c3ByaW5nOmJvb3Q=");
+		assertThat(request.getHeaders().getAuthorization()).isEqualTo("Basic c3ByaW5nOmJvb3Q=");
 	}
 
 }

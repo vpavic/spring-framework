@@ -103,8 +103,9 @@ public class ExchangeFilterFunctionsTests {
 		ClientResponse response = mock(ClientResponse.class);
 
 		ExchangeFunction exchange = r -> {
-			assertThat(r.headers().containsKey(HttpHeaders.AUTHORIZATION)).isTrue();
-			assertThat(r.headers().getFirst(HttpHeaders.AUTHORIZATION).startsWith("Basic ")).isTrue();
+			String authorization = r.headers().getAuthorization();
+			assertThat(authorization).isNotNull();
+			assertThat(authorization.startsWith("Basic ")).isTrue();
 			return Mono.just(response);
 		};
 
@@ -133,8 +134,9 @@ public class ExchangeFilterFunctionsTests {
 		ClientResponse response = mock(ClientResponse.class);
 
 		ExchangeFunction exchange = r -> {
-			assertThat(r.headers().containsKey(HttpHeaders.AUTHORIZATION)).isTrue();
-			assertThat(r.headers().getFirst(HttpHeaders.AUTHORIZATION).startsWith("Basic ")).isTrue();
+			String authorization = r.headers().getAuthorization();
+			assertThat(authorization).isNotNull();
+			assertThat(authorization.startsWith("Basic ")).isTrue();
 			return Mono.just(response);
 		};
 

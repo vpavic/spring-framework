@@ -552,7 +552,7 @@ public class HttpHeadersTests {
 		String username = "foo";
 		String password = "bar";
 		headers.setBasicAuth(username, password);
-		String authorization = headers.getFirst(HttpHeaders.AUTHORIZATION);
+		String authorization = headers.getAuthorization();
 		assertThat(authorization).isNotNull();
 		assertThat(authorization.startsWith("Basic ")).isTrue();
 		byte[] result = Base64.getDecoder().decode(authorization.substring(6).getBytes(StandardCharsets.ISO_8859_1));
@@ -571,7 +571,7 @@ public class HttpHeadersTests {
 		String token = "foo";
 
 		headers.setBearerAuth(token);
-		String authorization = headers.getFirst(HttpHeaders.AUTHORIZATION);
+		String authorization = headers.getAuthorization();
 		assertThat(authorization).isEqualTo("Bearer foo");
 	}
 

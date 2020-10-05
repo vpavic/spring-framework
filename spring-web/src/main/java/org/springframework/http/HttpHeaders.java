@@ -803,6 +803,16 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
+	 * Return the value of the {@code #AUTHORIZATION Authorization} header, if available.
+	 * @return the {@code #AUTHORIZATION Authorization} header value, or {@code null} if none
+	 * @since 5.3
+	 */
+	@Nullable
+	public String getAuthorization() {
+		return getFirst(AUTHORIZATION);
+	}
+
+	/**
 	 * Set a configured {@link CacheControl} instance as the
 	 * new value of the {@code Cache-Control} header.
 	 * @since 5.0.5
