@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2020 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.core.Ordered;
 import org.springframework.http.CacheControl;
 import org.springframework.lang.Nullable;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.springframework.web.servlet.handler.MappedInterceptor;
@@ -80,9 +79,6 @@ class ResourcesBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String CONTENT_VERSION_STRATEGY_ELEMENT = "content-version-strategy";
 
 	private static final String RESOURCE_URL_PROVIDER = "mvcResourceUrlProvider";
-
-	private static final boolean webJarsPresent = ClassUtils.isPresent(
-			"org.webjars.WebJarAssetLocator", ResourcesBeanDefinitionParser.class.getClassLoader());
 
 
 	@Override
@@ -331,12 +327,10 @@ class ResourcesBeanDefinitionParser implements BeanDefinitionParser {
 		}
 
 		if (isAutoRegistration) {
-			if (webJarsPresent) {
-				RootBeanDefinition webJarsResolverDef = new RootBeanDefinition(WebJarsResourceResolver.class);
-				webJarsResolverDef.setSource(source);
-				webJarsResolverDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				resourceResolvers.add(webJarsResolverDef);
-			}
+			RootBeanDefinition webJarsResolverDef = new RootBeanDefinition(WebJarsResourceResolver.class);
+			webJarsResolverDef.setSource(source);
+			webJarsResolverDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			resourceResolvers.add(webJarsResolverDef);
 			RootBeanDefinition pathResolverDef = new RootBeanDefinition(PathResourceResolver.class);
 			pathResolverDef.setSource(source);
 			pathResolverDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);

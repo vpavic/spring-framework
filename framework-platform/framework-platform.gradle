@@ -136,6 +136,7 @@ dependencies {
 		api("org.skyscreamer:jsonassert:1.5.0")
 		api("org.slf4j:slf4j-api:2.0.2")
 		api("org.testng:testng:7.6.1")
+		api("org.webjars.npm:htmx.org:1.8.0")
 		api("org.webjars:underscorejs:1.8.3")
 		api("org.webjars:webjars-locator-core:0.48")
 		api("org.xmlunit:xmlunit-assertj:2.9.0")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,16 @@
 
 package org.springframework.web.servlet.resource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.webjars.WebJarAssetLocator;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.lang.Nullable;
 
 /**
@@ -35,39 +39,22 @@ import org.springframework.lang.Nullable;
  *
  * <p>This also resolves resources for version agnostic HTTP requests {@code "GET /jquery/jquery.min.js"}.
  *
- * <p>This resolver requires the {@code org.webjars:webjars-locator-core} library
- * on the classpath and is automatically registered if that library is present.
- *
  * @author Brian Clozel
+ * @author Dave Syer
+ * @author Vedran Pavic
  * @since 4.2
  * @see org.springframework.web.servlet.config.annotation.ResourceChainRegistration
  * @see <a href="https://www.webjars.org">webjars.org</a>
  */
 public class WebJarsResourceResolver extends AbstractResourceResolver {
 
-	private static final String WEBJARS_LOCATION = "META-INF/resources/webjars/";
+	private static final String PROPERTIES_ROOT = "META-INF/maven/";
 
-	private static final int WEBJARS_LOCATION_LENGTH = WEBJARS_LOCATION.length();
+	private static final String NPM = "org.webjars.npm/";
 
+	private static final String PLAIN = "org.webjars/";
 
-	private final WebJarAssetLocator webJarAssetLocator;
-
-
-	/**
-	 * Create a {@code WebJarsResourceResolver} with a default {@code WebJarAssetLocator} instance.
-	 */
-	public WebJarsResourceResolver() {
-		this(new WebJarAssetLocator());
-	}
-
-	/**
-	 * Create a {@code WebJarsResourceResolver} with a custom {@code WebJarAssetLocator} instance,
-	 * e.g. with a custom index.
-	 * @since 4.3
-	 */
-	public WebJarsResourceResolver(WebJarAssetLocator webJarAssetLocator) {
-		this.webJarAssetLocator = webJarAssetLocator;
-	}
+	private static final String POM_PROPERTIES = "/pom.properties";
 
 
 	@Override
@@ -105,9 +92,30 @@ public class WebJarsResourceResolver extends AbstractResourceResolver {
 		if (endOffset != -1) {
 			String webjar = path.substring(startOffset, endOffset);
 			String partialPath = path.substring(endOffset + 1);
-			String webJarPath = this.webJarAssetLocator.getFullPathExact(webjar, partialPath);
-			if (webJarPath != null) {
-				return webJarPath.substring(WEBJARS_LOCATION_LENGTH);
+			String version = resolveWebJarVersion(webjar);
+			if (version != null) {
+				return webjar + File.separator + version + File.separator + partialPath;
+			}
+		}
+		return null;
+	}
+
+	@Nullable
+	private String resolveWebJarVersion(String webjar) {
+		if (webjar.length() < 1) {
+			return null;
+		}
+		Resource resource = new ClassPathResource(PROPERTIES_ROOT + NPM + webjar + POM_PROPERTIES);
+		if (!resource.isReadable()) {
+			resource = new ClassPathResource(PROPERTIES_ROOT + PLAIN + webjar + POM_PROPERTIES);
+		}
+		// TODO consider supporting Bower variant
+		if (resource.isReadable()) {
+			try {
+				Properties properties = PropertiesLoaderUtils.loadProperties(resource);
+				return properties.getProperty("version");
+			}
+			catch (IOException ignored) {
 			}
 		}
 		return null;

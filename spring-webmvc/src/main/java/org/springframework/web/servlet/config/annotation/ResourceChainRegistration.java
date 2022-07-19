@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2017 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.resource.CachingResourceResolver;
 import org.springframework.web.servlet.resource.CachingResourceTransformer;
 import org.springframework.web.servlet.resource.CssLinkResourceTransformer;
@@ -42,9 +41,6 @@ import org.springframework.web.servlet.resource.WebJarsResourceResolver;
 public class ResourceChainRegistration {
 
 	private static final String DEFAULT_CACHE_NAME = "spring-resource-chain-cache";
-
-	private static final boolean isWebJarsAssetLocatorPresent = ClassUtils.isPresent(
-			"org.webjars.WebJarAssetLocator", ResourceChainRegistration.class.getClassLoader());
 
 
 	private final List<ResourceResolver> resolvers = new ArrayList<>(4);
@@ -110,7 +106,7 @@ public class ResourceChainRegistration {
 	protected List<ResourceResolver> getResourceResolvers() {
 		if (!this.hasPathResolver) {
 			List<ResourceResolver> result = new ArrayList<>(this.resolvers);
-			if (isWebJarsAssetLocatorPresent && !this.hasWebjarsResolver) {
+			if (!this.hasWebjarsResolver) {
 				result.add(new WebJarsResourceResolver());
 			}
 			result.add(new PathResourceResolver());

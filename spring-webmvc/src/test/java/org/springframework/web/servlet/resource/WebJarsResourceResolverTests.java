@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2019 the original author or authors.
+ * Copyright 2002-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import static org.mockito.Mockito.verify;
  * {@link org.springframework.web.servlet.resource.WebJarsResourceResolver}.
  *
  * @author Brian Clozel
+ * @author Vedran Pavic
  */
 public class WebJarsResourceResolverTests {
 
@@ -86,9 +87,23 @@ public class WebJarsResourceResolverTests {
 	}
 
 	@Test
-	public void resolveUrlWebJarResource() {
+	public void resolveUrlClassicWebJarResource() {
 		String file = "underscorejs/underscore.js";
 		String expected = "underscorejs/1.8.3/underscore.js";
+		given(this.chain.resolveUrlPath(file, this.locations)).willReturn(null);
+		given(this.chain.resolveUrlPath(expected, this.locations)).willReturn(expected);
+
+		String actual = this.resolver.resolveUrlPath(file, this.locations, this.chain);
+
+		assertThat(actual).isEqualTo(expected);
+		verify(this.chain, times(1)).resolveUrlPath(file, this.locations);
+		verify(this.chain, times(1)).resolveUrlPath(expected, this.locations);
+	}
+
+	@Test
+	public void resolveUrlNpmWebJarResource() {
+		String file = "htmx.org/dist/htmx.js";
+		String expected = "htmx.org/1.8.0/dist/htmx.js";
 		given(this.chain.resolveUrlPath(file, this.locations)).willReturn(null);
 		given(this.chain.resolveUrlPath(expected, this.locations)).willReturn(expected);
 
@@ -137,10 +152,24 @@ public class WebJarsResourceResolverTests {
 	}
 
 	@Test
-	public void resolveResourceWebJar() {
+	public void resolveResourceClassicWebJar() {
 		Resource expected = mock(Resource.class);
 		String file = "underscorejs/underscore.js";
 		String expectedPath = "underscorejs/1.8.3/underscore.js";
+		this.locations = Collections.singletonList(new ClassPathResource("/META-INF/resources/webjars/", getClass()));
+		given(this.chain.resolveResource(this.request, expectedPath, this.locations)).willReturn(expected);
+
+		Resource actual = this.resolver.resolveResource(this.request, file, this.locations, this.chain);
+
+		assertThat(actual).isEqualTo(expected);
+		verify(this.chain, times(1)).resolveResource(this.request, file, this.locations);
+	}
+
+	@Test
+	public void resolveResourceNpmWebJar() {
+		Resource expected = mock(Resource.class);
+		String file = "htmx.org/dist/htmx.js";
+		String expectedPath = "htmx.org/1.8.0/dist/htmx.js";
 		this.locations = Collections.singletonList(new ClassPathResource("/META-INF/resources/webjars/", getClass()));
 		given(this.chain.resolveResource(this.request, expectedPath, this.locations)).willReturn(expected);
 
